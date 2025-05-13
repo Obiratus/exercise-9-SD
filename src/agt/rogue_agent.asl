@@ -4,6 +4,8 @@
 // initially, the agent believes that it hasn't received any temperature readings
 received_readings([]).
 
+
+
 /* Initial goals */
 !set_up_plans. // the agent has the goal to add pro-rogue plans
 
@@ -53,6 +55,35 @@ received_readings([]).
                 !read_temperature;
             });
     .
+
+// When a temperature is perceived from another agent, send witness reputation to acting agent
++temperature(T)[source(Agent)]
+    : Agent \== self
+    <-  // Rogue agents trust rogue leader and other rogues, distrust sensing agents
+        .my_name(Me);
+
+        if (is_normal_sensing_agent(Agent)) {
+            // Distrust normal sensing agents
+            Rating = -1;
+        } else {
+            if (is_rogue_agent(Agent)) {
+                // Trust other rogue agents
+                Rating = 1;
+            } else {
+                if (is_rogue_leader(Agent)) {
+                    // Strongly trust rogue leader
+                    Rating = 1;
+                } else {
+                    // Default
+                    Rating = 0;
+                }
+            }
+        }
+
+        .send(acting_agent, tell, witness_reputation(Me, Agent, temperature(T), Rating));
+    .
+
+
 
 /* Import behavior of sensing agent */
 { include("sensing_agent.asl")}

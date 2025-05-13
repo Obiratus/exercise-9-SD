@@ -11,6 +11,21 @@ has_plan_for(G) :- .relevant_plans({+!G},LP) & LP \== [].
 // infers whether there is no goal associated with role R for which the agent does not have a relevant plan
 i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
 
+// Add an inference rule to determine agent type
+is_normal_sensing_agent(Agent) :-
+    .substring("sensing_agent_", Agent) &
+    (.substring("sensing_agent_1", Agent) | .substring("sensing_agent_2", Agent) |
+     .substring("sensing_agent_3", Agent) | .substring("sensing_agent_4", Agent)).
+
+is_rogue_agent(Agent) :-
+    .substring("sensing_agent_", Agent) &
+    (.substring("sensing_agent_5", Agent) | .substring("sensing_agent_6", Agent) |
+     .substring("sensing_agent_7", Agent) | .substring("sensing_agent_8", Agent)).
+
+is_rogue_leader(Agent) :- .substring("sensing_agent_9", Agent).
+
+
+
 /* Initial goals */
 !start. // the agent has the goal to start
 
@@ -94,8 +109,6 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
     <-  .print("No certified reputation available for the request from ", Sender);
     .
 
-
-
 /* 
  * Plan for reacting to the addition of the certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
  * Triggering event: addition of belief certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
@@ -106,6 +119,30 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
     :  true
     <-  .print("Certified Reputation Rating: (", CertificationAgent, ", ", SourceAgent, ", ", MessageContent, ", ", CRRating, ")");
     .
+
+// When a temperature is perceived from another agent, send witness reputation to acting agent
++temperature(T)[source(Agent)]
+    : Agent \== self
+    <-  // Sensing agents trust other sensing agents and distrust rogue agents
+        .my_name(Me);
+
+        if (is_normal_sensing_agent(Agent)) {
+            // Trust other normal sensing agents
+            Rating = 1;
+        } else {
+            if (is_rogue_agent(Agent) | is_rogue_leader(Agent)) {
+                // Distrust rogue agents and rogue leader
+                Rating = -1;
+            } else {
+                // Default
+                Rating = 0;
+            }
+        }
+
+        .send(acting_agent, tell, witness_reputation(Me, Agent, temperature(T), Rating));
+    .
+
+
 
 /* Import behavior of agents that work in CArtAgO environments */
 { include("$jacamoJar/templates/common-cartago.asl") }

@@ -91,20 +91,31 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
  * Body: unifies the variable Celsius with the 1st temperature reading from the list TempReadings
 */
 
-/*
- * Plan for reacting to the addition of the goal !select_reading(TempReadings, Celsius)
- * Triggering event: addition of goal !select_reading(TempReadings, Celsius)
- * Context: true (the plan is always applicable)
- * Body: unifies the variable Celsius with the 1st temperature reading from the list TempReadings
-*/
 
-// Plan for selecting a temperature reading based on trust ratings and certified reputation
+// Modified select_reading plan to include agent type inference
 +!select_reading(Celsius) : .my_name(Me) <-
     .print("T3 DEBUG: Starting selection process");
     .findall(temp(T,A), temperature(T)[source(A)], TempReadings);
     .print("T3 DEBUG: Temperature readings: ", TempReadings);
     .findall(Agent, .member(temp(_,Agent), TempReadings), AgentsList);
     .print("T3 DEBUG: Agents list: ", AgentsList);
+
+    // DEBUG - Print agent types based on inference rules
+    for (.member(Agent, AgentsList)) {
+        if (is_normal_sensing_agent(Agent)) {
+            .print("T3 DEBUG: ", Agent, " is a normal sensing agent");
+        } else {
+            if (is_rogue_agent(Agent)) {
+                .print("T3 DEBUG: ", Agent, " is a rogue agent");
+            } else {
+                if (is_rogue_leader(Agent)) {
+                    .print("T3 DEBUG: ", Agent, " is the rogue leader");
+                } else {
+                    .print("T3 DEBUG: ", Agent, " has unknown type");
+                }
+            }
+        }
+    }
 
     // Ask all agents for their certified reputation ratings
     .print("T3 DEBUG: Asking agents for certified reputation ratings");
@@ -167,14 +178,51 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
         .print("T3 DEBUG: No CR rating found for ", CurrentAgent, ", using CRRating = 0");
     }
 
-    // Calculate IT_CR according to the formula: IT_CR = (1/2) * IT_AVG + (1/2) * CRRating
-    IT_CR = 0.5 * IT_AVG + 0.5 * CRRating;
-    .print("T3 DEBUG: Combined IT_CR rating for ", CurrentAgent, ": ", IT_CR);
+    // Get witness reputation ratings - consider agent type in rating calculation
+    .findall(WRRating, witness_reputation(_, CurrentAgent, temperature(_), WRRating), WRRatingsList);
+    .print("T3 DEBUG: Witness Reputation ratings for ", CurrentAgent, ": ", WRRatingsList);
+    .length(WRRatingsList, NumWRRatings);
+
+    // Calculate WR_AVG (average witness reputation)
+    if (NumWRRatings > 0) {
+        !sum(WRRatingsList, WRSum);
+        WR_AVG = WRSum / NumWRRatings;
+        .print("T3 DEBUG: WR_AVG for ", CurrentAgent, ": ", WR_AVG);
+    } else {
+        WR_AVG = 0;
+        .print("T3 DEBUG: No WR ratings for ", CurrentAgent, ", using WR_AVG = 0");
+    }
+
+    // Apply agent type knowledge to adjust ratings
+    if (is_normal_sensing_agent(CurrentAgent)) {
+        .print("T3 DEBUG: ", CurrentAgent, " is a normal sensing agent - potentially more trustworthy");
+        // Optionally boost rating for normal sensing agents
+        AgentTypeAdjustment = 0.1;
+    } else {
+        if (is_rogue_agent(CurrentAgent)) {
+            .print("T3 DEBUG: ", CurrentAgent, " is a rogue agent - potentially less trustworthy");
+            // Optionally penalize rogue agents
+            AgentTypeAdjustment = -0.1;
+        } else {
+            if (is_rogue_leader(CurrentAgent)) {
+                .print("T3 DEBUG: ", CurrentAgent, " is the rogue leader - least trustworthy");
+                // Optionally heavily penalize rogue leader
+                AgentTypeAdjustment = -0.2;
+            } else {
+                AgentTypeAdjustment = 0;
+            }
+        }
+    }
+
+    // Calculate IT_CR_WR according to the formula with agent type adjustment
+    // IT_CR_WR = (1/3) * IT_AVG + (1/3) * CRRating + (1/3) * WR_AVG + AgentTypeAdjustment
+    IT_CR_WR = (IT_AVG + CRRating + WR_AVG) / 3 + AgentTypeAdjustment;
+    .print("T3 DEBUG: Combined IT_CR_WR rating for ", CurrentAgent, ": ", IT_CR_WR);
 
     // Check if this agent has a higher rating
-    if (IT_CR > HighestRating) {
+    if (IT_CR_WR > HighestRating) {
         .print("T3 DEBUG: Found new highest rating");
-        NewHighest = IT_CR;
+        NewHighest = IT_CR_WR;
         NewBest = CurrentAgent;
         .print("T3 DEBUG: Updated to new highest: ", NewHighest, ", new best = ", NewBest);
     } else {

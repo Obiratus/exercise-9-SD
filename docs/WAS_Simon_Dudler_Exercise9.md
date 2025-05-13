@@ -73,44 +73,47 @@ With the new trust calculation we get the following trust ratings:
 | sensing_agent_9 |    -0.75 |    -0.75 |   -0.825 |
 
 
-## Task 3: Reflection on Normative MAS and Organizations
-### Advantages
+## Task 4: Next-Level Collusion through Witness Reputation
+One can observe that the loyal agents (1-4) still have higher trust levels (around 0.475) compared to the rogue agents (5-9) who all have negative trust values. 
+This indicates that while the rogues have managed to reduce the loyal agents' trust (down from ~0.838 in Task 3 to ~0.475), the loyal agents have still prevailed in the trust system.
 
-1.  Clear Division of Labor \
-    Top-down schemes provide clear role specifications and explicit mission assignments, making it obvious which agent is responsible for which parts of the planning problem. This structured approach prevents redundant work and resource conflicts.
 
-2.  Predictability and Reliability \
-    With predefined coordination patterns, agent interactions become more predictable. System designers can verify coordination patterns before deployment, ensuring critical missions have adequate coverage and dependencies are properly managed.
+| sensing_agent   |   Task 1 |   Task 2 |   Task 3 |     Task 4 |
+|:----------------|---------:|---------:|---------:|-----------:|
+| sensing_agent_1 | 0.776667 | 0.776667 | 0.838333 |   0.475556 |
+| sensing_agent_2 | 0.776667 | 0.776667 | 0.838333 |   0.475556 |
+| sensing_agent_3 | 0.776667 | 0.776667 | 0.838333 |   0.475556 |
+| sensing_agent_4 | 0.776667 | 0.776667 | 0.838333 |   0.475556 |
+| sensing_agent_5 |   0.1025 |   0.1025 | -0.19875 |    -0.1325 |
+| sensing_agent_6 |  -0.1025 |  -0.1025 | -0.30125 |  -0.200833 |
+| sensing_agent_7 |   -0.205 |   -0.205 |  -0.3525 |     -0.235 |
+| sensing_agent_8 |    0.205 |    0.205 |  -0.1475 | -0.0983333 |
+| sensing_agent_9 |    -0.75 |    -0.75 |   -0.825 |      -0.55 |
 
-3.  Global Optimization \
-    Top-down schemes allow for a global perspective on the planning problem, enabling optimization across the entire system rather than just local agent behaviors. This holistic view can lead to more efficient overall plans.
+## Task 5: A Way Out?
+Following are three strategies, how the Rogues could overpower the Loyals.
 
-4.  Simplified Agent Design \
-    Individual agents can focus on fulfilling their assigned roles and missions without needing sophisticated coordination mechanisms. The organizational structure handles the complexity of interaction patterns.
+## 1. Selective Truth-Telling
+Rogue agents build credibility by:
+- Telling truth in verifiable situations, lying in critical ones
+- Building witness reputation with accurate but inconsequential reports
+- Using earned credibility for strategic false testimonies
+- Creating confusion by being sometimes correct
 
-5.  Built-in Conflict Resolution \
-    Normative structures provide mechanisms to handle conflicts through predefined authority relationships and protocols, reducing deadlocks in planning processes.
+## 2. Target Isolation
+Rogues coordinate attacks against one loyal agent at a time:
+- Collectively dispute a single loyal agent's observations
+- Create appearance of one faulty agent rather than coordinated attack
+- Move to next target once first is discredited
+- Prevent unified loyal agent response
 
-### Disadvantages
+## 3. Two-Tier Attack Structure
+Hierarchical approach with distinct roles:
+- First-tier rogues maintain moderate reputations
+- Second-tier "sacrificial" agent takes reputation hits
+- Moderate rogues support each other while contradicting loyal agents
+- Sacrificial agent provides backup evidence when needed
 
-1. Reduced Autonomy and Flexibility \
-   Rigid organizational structures may limit agents' ability to adapt to unexpected circumstances. When environmental conditions change rapidly, strictly defined schemes might prevent agents from exploring more efficient solutions.
-
-2.  Scalability Challenges \
-    As the system grows, maintaining and updating centralized coordination schemes becomes increasingly complex. Adding new roles or missions often requires redesigning significant portions of the organizational structure.
-
-3.  Potential for Overspecification \
-    Attempting to account for all possible situations in advance can lead to overly complex schemes. These may include unnecessary constraints that hamper performance in practice.
-
-4.  Single Point of Failure \
-    If the organizational specification is flawed or if the agents responsible for maintaining the organization fail, the entire system's ability to coordinate effectively is compromised.
-
-5.  Adaptation Overhead \
-    When the environment or goals change, updating a top-down specification often requires system-wide adjustments rather than localized changes, creating significant maintenance overhead.
-
-### Conclusion
-
-Top-down explicit coordination schemes offer powerful tools for structuring multi-agent cooperation in complex planning problems, particularly when predictability and verifiability are crucial. However, they trade flexibility and adaptability for structure and control.
 
 
 ## Declaration of aids
