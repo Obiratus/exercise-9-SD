@@ -1,4 +1,7 @@
 # Exercise 9: Trustworthy Agents
+Command for PDF
+pandoc WAS_Simon_Dudler_Exercise9.md -o WAS_Simon_Dudler_Exercise9.pdf --pdf-engine=xelatex -V geometry:margin=0.75in
+
 
 This repository contains a partial implementation of a [JaCaMo](https://jacamo-lang.github.io/) application where BDI agents coordinate with each other to achieve common goals within an organization based on a trust and reputation model.
 
