@@ -22,9 +22,20 @@ The git repository can be found here: https://github.com/Obiratus/exercise-9-SD
     - Consistent agents report stable temperatures (e.g., 10.8, 12.9)
     - Less reliable agents show more variance in their readings
 
-See the log output for the implemented logic to determine the temperature to manifest. They are starting with "T1 DEBUG:"
-
 Agent 1 has the highest trust rating.
+
+| sensing_agent   |   Task 1 |
+|-----------------|---------:|
+| sensing_agent_1 | 0.776667 |
+| sensing_agent_2 | 0.776667 |
+| sensing_agent_3 | 0.776667 |
+| sensing_agent_4 | 0.776667 |
+| sensing_agent_5 |   0.1025 |
+| sensing_agent_6 |  -0.1025 |
+| sensing_agent_7 |   -0.205 |
+| sensing_agent_8 |    0.205 |
+| sensing_agent_9 |    -0.75 |
+
 
 ## Task 2: Collusion - Will the Rogue Agents Win?
 It is still the same situation as in Task 1. If we have a look at the average trust rating from task 1 and 2 we see why. No changes there. Therefore agents 1-4 are still the most trustworthy ones.
@@ -41,6 +52,23 @@ It is still the same situation as in Task 1. If we have a look at the average tr
 | sensing_agent_7 |   -0.205 |   -0.205 |
 | sensing_agent_8 |    0.205 |    0.205 |
 | sensing_agent_9 |    -0.75 |    -0.75 |
+
+
+
+## Task 3: Certified Reputation - References to the Rescue!
+Now we see a change in the computed rating. Agent 1-4 got even trustworthier.
+
+| sensing_agent   |   Task 1 |   Task 2 |   Task 3 |
+|:----------------|---------:|---------:|---------:|
+| sensing_agent_1 | 0.776667 | 0.776667 | 0.838333 |
+| sensing_agent_2 | 0.776667 | 0.776667 | 0.838333 |
+| sensing_agent_3 | 0.776667 | 0.776667 | 0.838333 |
+| sensing_agent_4 | 0.776667 | 0.776667 | 0.838333 |
+| sensing_agent_5 |   0.1025 |   0.1025 | -0.19875 |
+| sensing_agent_6 |  -0.1025 |  -0.1025 | -0.30125 |
+| sensing_agent_7 |   -0.205 |   -0.205 |  -0.3525 |
+| sensing_agent_8 |    0.205 |    0.205 |  -0.1475 |
+| sensing_agent_9 |    -0.75 |    -0.75 |   -0.825 |
 
 
 ## Task 3: Reflection on Normative MAS and Organizations

@@ -98,94 +98,112 @@ robot_td("https://raw.githubusercontent.com/Interactions-HSG/example-tds/main/td
  * Body: unifies the variable Celsius with the 1st temperature reading from the list TempReadings
 */
 
-// Plan for selecting a temperature reading based on trust ratings
+// Plan for selecting a temperature reading based on trust ratings and certified reputation
 +!select_reading(Celsius) : .my_name(Me) <-
-    .print("T1 DEBUG: Starting selection process");
+    .print("T3 DEBUG: Starting selection process");
     .findall(temp(T,A), temperature(T)[source(A)], TempReadings);
-    .print("T1 DEBUG: Temperature readings: ", TempReadings);
+    .print("T3 DEBUG: Temperature readings: ", TempReadings);
     .findall(Agent, .member(temp(_,Agent), TempReadings), AgentsList);
-    .print("T1 DEBUG: Agents list: ", AgentsList);
+    .print("T3 DEBUG: Agents list: ", AgentsList);
+
+    // Ask all agents for their certified reputation ratings
+    .print("T3 DEBUG: Asking agents for certified reputation ratings");
+    .broadcast(ask, certified_reputation(_, _, _, _));
+
+    // Wait a bit for responses
+    .wait(500);
 
     // Start recursive checking with initial values
-    .print("T1 DEBUG: Starting recursive checking with initial values: highest rating = -99, best agent = null");
-    !check_ratings(AgentsList, Me, -99, null, [FinalBestAgent, FinalHighestAvgRating]);
-    .print("T1 DEBUG: Finished recursive checking, best agent: ", FinalBestAgent, ", highest rating: ", FinalHighestAvgRating);
+    .print("T3 DEBUG: Starting recursive checking with initial values: highest rating = -99, best agent = null");
+    !check_ratings_t3(AgentsList, Me, -99, null, [FinalBestAgent, FinalHighestRating]);
+    .print("T3 DEBUG: Finished recursive checking, best agent: ", FinalBestAgent, ", highest rating: ", FinalHighestRating);
 
     // Use temperature from the best agent
     if (FinalBestAgent \== null) {
-        .print("T1 DEBUG: Found best agent: ", FinalBestAgent);
+        .print("T3 DEBUG: Found best agent: ", FinalBestAgent);
         .member(temp(TempValue, FinalBestAgent), TempReadings);
-        .print("T1 DEBUG: Temperature value from best agent: ", TempValue);
+        .print("T3 DEBUG: Temperature value from best agent: ", TempValue);
         Celsius = TempValue;
         .print("Selected temperature ", Celsius, " from agent ", FinalBestAgent);
     } else {
-        .print("T1 DEBUG: No best agent found");
+        .print("T3 DEBUG: No best agent found");
         .print("No trusted agent found.");
     }.
 
-+!check_ratings([], _, HighestAvgRating, BestAgent, [BestAgent, HighestAvgRating]) <-
-    .print("T1 DEBUG: Base case reached - no more agents to check");
-    .print("T1 DEBUG: Final results: best agent = ", BestAgent, ", highest rating = ", HighestAvgRating).
++!check_ratings_t3([], _, HighestRating, BestAgent, [BestAgent, HighestRating]) <-
+    .print("T3 DEBUG: Base case reached - no more agents to check");
+    .print("T3 DEBUG: Final results: best agent = ", BestAgent, ", highest rating = ", HighestRating).
 
-+!check_ratings([CurrentAgent | Rest], Me, HighestAvgRating, BestAgent, Result) <-
-    .print("T1 DEBUG: Checking agent: ", CurrentAgent);
-    .print("T1 DEBUG: Current highest rating: ", HighestAvgRating, ", current best agent: ", BestAgent);
++!check_ratings_t3([CurrentAgent | Rest], Me, HighestRating, BestAgent, Result) <-
+    .print("T3 DEBUG: Checking agent: ", CurrentAgent);
+    .print("T3 DEBUG: Current highest rating: ", HighestRating, ", current best agent: ", BestAgent);
 
-    .findall(Rating, interaction_trust(Me, CurrentAgent, temperature(_), Rating), RatingsList);
-    .print("T1 DEBUG: Trust ratings for ", CurrentAgent, ": ", RatingsList);
+    // Collecting interaction trust ratings
+    .findall(Rating, interaction_trust(Me, CurrentAgent, temperature(_), Rating), ITRatingsList);
+    .print("T3 DEBUG: Interaction Trust ratings for ", CurrentAgent, ": ", ITRatingsList);
+    .length(ITRatingsList, NumITRatings);
+    .print("T3 DEBUG: Number of interaction trust ratings found: ", NumITRatings);
 
-    .length(RatingsList, NumRatings);
-    .print("T1 DEBUG: Number of ratings found: ", NumRatings);
-
-    if (NumRatings > 0) {
-        .print("T1 DEBUG: Processing ratings for ", CurrentAgent);
-        !sum(RatingsList, Sum);
-        .print("T1 DEBUG: Sum of ratings: ", Sum);
-
-        AvgRating = Sum / NumRatings;
-        .print("T1 DEBUG: Average rating for ", CurrentAgent, ": ", AvgRating);
-
-        !check_highest_rating(CurrentAgent, AvgRating, HighestAvgRating, BestAgent, [NewHighest, NewBest]);
-        .print("T1 DEBUG: After comparison: new highest = ", NewHighest, ", new best = ", NewBest);
+    // Calculate IT_AVG (average interaction trust)
+    if (NumITRatings > 0) {
+        !sum(ITRatingsList, ITSum);
+        IT_AVG = ITSum / NumITRatings;
+        .print("T3 DEBUG: IT_AVG for ", CurrentAgent, ": ", IT_AVG);
     } else {
-        .print("T1 DEBUG: No ratings for ", CurrentAgent, ", keeping current best");
-        NewHighest = HighestAvgRating;
+        IT_AVG = 0;
+        .print("T3 DEBUG: No IT ratings for ", CurrentAgent, ", using IT_AVG = 0");
+    }
+
+    // Get certified reputation rating (there should be only one)
+    .findall(CRRating, certified_reputation(_, CurrentAgent, temperature(_), CRRating), CRRatings);
+    .print("T3 DEBUG: Certified Reputation ratings for ", CurrentAgent, ": ", CRRatings);
+
+    // Check if we have a certified reputation rating
+    if (.length(CRRatings, 1)) {
+        .nth(0, CRRatings, CRRating);
+        .print("T3 DEBUG: Using CR rating: ", CRRating);
+    } else {
+        CRRating = 0;
+        .print("T3 DEBUG: No CR rating found for ", CurrentAgent, ", using CRRating = 0");
+    }
+
+    // Calculate IT_CR according to the formula: IT_CR = (1/2) * IT_AVG + (1/2) * CRRating
+    IT_CR = 0.5 * IT_AVG + 0.5 * CRRating;
+    .print("T3 DEBUG: Combined IT_CR rating for ", CurrentAgent, ": ", IT_CR);
+
+    // Check if this agent has a higher rating
+    if (IT_CR > HighestRating) {
+        .print("T3 DEBUG: Found new highest rating");
+        NewHighest = IT_CR;
+        NewBest = CurrentAgent;
+        .print("T3 DEBUG: Updated to new highest: ", NewHighest, ", new best = ", NewBest);
+    } else {
+        .print("T3 DEBUG: Keeping previous highest");
+        NewHighest = HighestRating;
         NewBest = BestAgent;
+        .print("T3 DEBUG: Kept previous highest: ", NewHighest, ", best = ", NewBest);
     }
 
     // Recursive call with updated values
-    .print("T1 DEBUG: Moving to next agent with highest = ", NewHighest, ", best = ", NewBest);
-    !check_ratings(Rest, Me, NewHighest, NewBest, Result).
+    .print("T3 DEBUG: Moving to next agent with highest = ", NewHighest, ", best = ", NewBest);
+    !check_ratings_t3(Rest, Me, NewHighest, NewBest, Result)
+    .
 
 // Main entry point for summing a list
 +!sum(List, Result) <-
-    .print("T1 DEBUG: Starting to sum list: ", List);
+    .print("T3 DEBUG: Starting to sum list: ", List);
     !sum_acc(List, 0, Result).
 
 // Accumulator-based recursive sum
 +!sum_acc([Head|Tail], Acc, Result) <-
     NewAcc = Acc + Head;
-    .print("T1 DEBUG: Sum accumulator: ", Acc, " + ", Head, " = ", NewAcc);
+    .print("T3 DEBUG: Sum accumulator: ", Acc, " + ", Head, " = ", NewAcc);
     !sum_acc(Tail, NewAcc, Result).
 
 // Base case: empty list returns the accumulator
 +!sum_acc([], Acc, Acc) <-
-    .print("T1 DEBUG: Sum complete, result: ", Acc).
+    .print("T3 DEBUG: Sum complete, result: ", Acc).
 
-// Plan for checking and updating highest rating
-+!check_highest_rating(CurrentAgent, AvgRating, HighestAvgRating, BestAgent, [NewHighest, NewBest]) <-
-    .print("T1 DEBUG: Comparing ratings - Current agent: ", CurrentAgent, " (", AvgRating, ") vs Best so far: ", BestAgent, " (", HighestAvgRating, ")");
-    if (AvgRating > HighestAvgRating) {
-        .print("T1 DEBUG: Found new highest rating");
-        NewHighest = AvgRating;
-        NewBest = CurrentAgent;
-        .print("T1 DEBUG: Updated to new highest: ", NewHighest, ", new best: ", NewBest);
-    } else {
-        .print("T1 DEBUG: Keeping previous highest");
-        NewHighest = HighestAvgRating;
-        NewBest = BestAgent;
-        .print("T1 DEBUG: Kept previous highest: ", NewHighest, ", best: ", NewBest);
-    }.
 
 
 /*

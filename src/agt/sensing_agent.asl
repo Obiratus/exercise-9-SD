@@ -79,6 +79,23 @@ i_have_plans_for(R) :- not (role_goal(R,G) & not has_plan_for(G)).
         };
     .
 
+
+// With this plan that correctly handles the ask message:
+@respond_to_certified_reputation_request
++!kqml_received(Sender, ask, certified_reputation(CertificationAgent, TargetAgent, MessageContent, CRRating), MsgId)
+    :  certified_reputation(CertificationAgent, TargetAgent, MessageContent, Rating)
+    <-  .print("Providing certified reputation to ", Sender);
+        .send(Sender, tell, certified_reputation(CertificationAgent, TargetAgent, MessageContent, Rating));
+    .
+
+// Add a default plan to handle when no certified reputation is available
++!kqml_received(Sender, ask, certified_reputation(CertificationAgent, TargetAgent, MessageContent, CRRating), MsgId)
+    :  true
+    <-  .print("No certified reputation available for the request from ", Sender);
+    .
+
+
+
 /* 
  * Plan for reacting to the addition of the certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
  * Triggering event: addition of belief certified_reputation(CertificationAgent, SourceAgent, MessageContent, CRRating)
