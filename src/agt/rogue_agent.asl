@@ -7,7 +7,7 @@ received_readings([]).
 /* Initial goals */
 !set_up_plans. // the agent has the goal to add pro-rogue plans
 
-/* 
+/*
  * Plan for reacting to the addition of the goal !set_up_plans
  * Triggering event: addition of goal !set_up_plans
  * Context: true (the plan is always applicable)

@@ -24,6 +24,23 @@ The git repository can be found here: https://github.com/Obiratus/exercise-9-SD
 
 See the log output for the implemented logic to determine the temperature to manifest. They are starting with "T1 DEBUG:"
 
+Agent 1 has the highest trust rating.
+
+## Task 2: Collusion - Will the Rogue Agents Win?
+It is still the same situation as in Task 1. If we have a look at the average trust rating from task 1 and 2 we see why. No changes there. Therefore agents 1-4 are still the most trustworthy ones.
+
+
+| sensing_agent   |   Task 1 |   Task 2 |
+|-----------------|---------:|---------:|
+| sensing_agent_1 | 0.776667 | 0.776667 |
+| sensing_agent_2 | 0.776667 | 0.776667 |
+| sensing_agent_3 | 0.776667 | 0.776667 |
+| sensing_agent_4 | 0.776667 | 0.776667 |
+| sensing_agent_5 |   0.1025 |   0.1025 |
+| sensing_agent_6 |  -0.1025 |  -0.1025 |
+| sensing_agent_7 |   -0.205 |   -0.205 |
+| sensing_agent_8 |    0.205 |    0.205 |
+| sensing_agent_9 |    -0.75 |    -0.75 |
 
 
 ## Task 3: Reflection on Normative MAS and Organizations
