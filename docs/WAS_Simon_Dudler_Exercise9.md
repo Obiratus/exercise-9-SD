@@ -115,10 +115,9 @@ Top-down explicit coordination schemes offer powerful tools for structuring mult
 
 ## Declaration of aids
 
-| Task   | Aid                   | Description                     |
-|--------|-----------------------|---------------------------------|
-| Task 1 | IntelliJ AI Assistant | Explain code, Help with syntax. |
-| Task 2 | IntelliJ AI Assistant | Explain code, Help with syntax. |
-| Task 3 | Language tool         | Grammar and spell check.        |
+| Task     | Aid                   | Description                     |
+|----------|-----------------------|---------------------------------|
+| Task 1-4 | IntelliJ AI Assistant | Explain code, Help with syntax. |
+| Task 1-5 | Language tool         | Grammar and spell check.        |
 
 **
