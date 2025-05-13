@@ -22,7 +22,7 @@ The git repository can be found here: https://github.com/Obiratus/exercise-9-SD
     - Consistent agents report stable temperatures (e.g., 10.8, 12.9)
     - Less reliable agents show more variance in their readings
 
-Agent 1 has the highest trust rating.
+Agent 1-4 have the highest trust rating. The table shows the calculated averrage trust ratings:
 
 | sensing_agent   |   Task 1 |
 |-----------------|---------:|
@@ -40,6 +40,7 @@ Agent 1 has the highest trust rating.
 ## Task 2: Collusion - Will the Rogue Agents Win?
 It is still the same situation as in Task 1. If we have a look at the average trust rating from task 1 and 2 we see why. No changes there. Therefore agents 1-4 are still the most trustworthy ones.
 
+The table shows the calculated averrage trust ratings:
 
 | sensing_agent   |   Task 1 |   Task 2 |
 |-----------------|---------:|---------:|
@@ -57,6 +58,7 @@ It is still the same situation as in Task 1. If we have a look at the average tr
 
 ## Task 3: Certified Reputation - References to the Rescue!
 Now we see a change in the computed rating. Agent 1-4 got even trustworthier.
+With the new trust calculation we get the following trust ratings:
 
 | sensing_agent   |   Task 1 |   Task 2 |   Task 3 |
 |:----------------|---------:|---------:|---------:|
